@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - AI PackSavvy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/custom.css">
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --secondary: #10b981;
+      --accent: #f59e0b;
+    }
+    
+    .login-bg {
+      background-image: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)), url('../assets/images/travel-bg.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+    
+    .login-card {
+      backdrop-filter: blur(10px);
+      background: rgba(30, 41, 59, 0.8);
+    }
+    
+    .input-field {
+      transition: all 0.3s ease;
+    }
+    
+    .input-field:focus {
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+    
+    .glow {
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    }
+    
+    .glow:hover {
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center login-bg p-4">
+  <div class="login-card max-w-md w-full rounded-xl overflow-hidden border border-gray-700 shadow-xl">
+    <div class="p-8">
+      <div class="text-center mb-8">
+        <img src="assets/icons/suitcase.svg" alt="Logo" class="h-12 w-12 mx-auto mb-4">
+        <h1 class="text-3xl font-bold text-white">Welcome Back</h1>
+        <p class="text-blue-100 mt-2">Sign in to access your saved packing lists</p>
+      </div>
+      
+      <form id="loginForm" class="space-y-6">
+        <div>
+          <label for="email" class="block text-sm font-medium text-blue-100 mb-1">Email</label>
+          <input type="email" id="email" name="email" required
+            class="input-field w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none text-white placeholder-gray-400">
+        </div>
+        
+        <div>
+          <label for="password" class="block text-sm font-medium text-blue-100 mb-1">Password</label>
+          <input type="password" id="password" name="password" required
+            class="input-field w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:outline-none text-white placeholder-gray-400">
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <label class="flex items-center">
+            <input type="checkbox" name="remember" class="h-4 w-4 text-blue-600 rounded border-gray-600 bg-gray-700 focus:ring-blue-500">
+            <span class="ml-2 text-sm text-blue-100">Remember me</span>
+          </label>
+          
+          <a href="#" class="text-sm text-blue-400 hover:text-blue-300">Forgot password?</a>
+        </div>
+        
+        <button type="submit" class="w-full px-6 py-3 bg-blue-600 rounded-lg text-white font-medium hover:bg-blue-700 transition glow">
+          Sign In
+        </button>
+      </form>
+      
+      <div class="mt-6 text-center">
+        <p class="text-blue-100">Don't have an account? 
+          <a href="register.html" class="text-blue-400 hover:text-blue-300 font-medium">Sign up</a>
+        </p>
+      </div>
+      
+      <div class="mt-8 pt-6 border-t border-gray-700">
+        <div class="flex justify-center space-x-4">
+          <button class="p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition">
+            <img src="assets/icons/google.svg" alt="Google" class="h-5 w-5">
+          </button>
+          <button class="p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition">
+            <img src="assets/icons/facebook.svg" alt="Facebook" class="h-5 w-5">
+          </button>
+          <button class="p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition">
+            <img src="assets/icons/apple.svg" alt="Apple" class="h-5 w-5">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const form = e.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      
+      // Show loading state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="flex items-center justify-center"><svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Signing in...</span>';
+      
+      try {
+        const formData = new FormData(form);
+        const response = await fetch('php/user-auth.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams(formData)
+        });
+        
+        if (!response.ok) {
+          throw new Error('Login failed');
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Store user token in localStorage
+          localStorage.setItem('authToken', data.token);
+          
+          // Redirect to dashboard
+          window.location.href = 'index.html';
+        } else {
+          throw new Error(data.message || 'Invalid credentials');
+        }
+      } catch (error) {
+        alert(error.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
+    
+    // Check if user is already logged in
+    if (localStorage.getItem('authToken')) {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

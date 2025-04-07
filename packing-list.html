@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Packing List - AI PackSavvy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --secondary: #10b981;
+      --accent: #f59e0b;
+    }
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    
+    .category-card {
+      transition: all 0.3s ease;
+    }
+    
+    .category-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .item-checkbox:checked + .item-label {
+      text-decoration: line-through;
+      color: #94a3b8;
+    }
+    
+    .weather-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+      backdrop-filter: blur(10px);
+    }
+    
+    .glow {
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    }
+    
+    .glow:hover {
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .floating-icon {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .emoji-icon {
+      font-size: 1.25rem; /* 20px */
+      line-height: 1.75rem; /* 28px */
+      margin-right: 0.5rem; /* 8px */
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-900">
+  <!-- Header -->
+  <header class="py-6 px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <span class="emoji-icon">🧳</span>
+        <h1 class="text-xl font-bold text-white">AI PackSavvy</h1>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button onclick="window.print()" class="p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition">
+          <span class="emoji-icon">🖨️</span>
+        </button>
+        <button onclick="exportPDF()" class="p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition">
+          <span class="emoji-icon">📄</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-4xl">
+    <div id="pdfContent">
+      <!-- Trip Summary -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2">Your Packing List</h2>
+          <p id="tripSummary" class="text-blue-100">Loading trip details...</p>
+        </div>
+        <div class="mt-4 sm:mt-0">
+          <span id="bagSuggestion" class="inline-flex items-center px-4 py-2 rounded-full bg-blue-600 text-sm font-medium text-white">
+            <span class="emoji-icon">🎒</span>
+            <span>Loading bag suggestion...</span>
+          </span>
+        </div>
+      </div>
+      
+      <!-- Weather Forecast -->
+      <div id="weatherContainer" class="weather-card rounded-xl p-6 mb-8">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+          <span class="emoji-icon">🌤️</span>
+          Weather Forecast
+        </h3>
+        <div id="weatherForecast" class="flex overflow-x-auto pb-2 -mx-1">
+          <!-- Weather cards will be inserted here -->
+        </div>
+      </div>
+      
+      <!-- Packing List Categories -->
+      <div id="packingListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Categories will be inserted here -->
+      </div>
+      
+      <!-- AI Tips -->
+      <div id="tipsContainer" class="mt-10 bg-gray-800/70 rounded-xl p-6 border border-yellow-500/30">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+          <span class="emoji-icon">💡</span>
+          PackSavvy Tips
+        </h3>
+        <div id="tipsContent" class="space-y-3">
+          <!-- Tips will be inserted here -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="mt-10 flex flex-wrap gap-4">
+      <a href="edit-list.html" class="px-6 py-3 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition flex items-center glow">
+        <span class="emoji-icon">✏️</span>
+        Edit List
+      </a>
+      <button onclick="saveList()" class="px-6 py-3 bg-purple-600 rounded-lg text-white hover:bg-purple-700 transition flex items-center glow">
+        <span class="emoji-icon">💾</span>
+        Save List
+      </button>
+      <button onclick="exportPDF()" class="px-6 py-3 bg-green-600 rounded-lg text-white hover:bg-green-700 transition flex items-center glow">
+        <span class="emoji-icon">📥</span>
+        Export PDF
+      </button>
+      <a href="trip-form.html" class="px-6 py-3 bg-gray-600 rounded-lg text-white hover:bg-gray-700 transition flex items-center">
+        <span class="emoji-icon">🆕</span>
+        New List
+      </a>
+    </div>
+  </main>
+
+  <script>
+    // Load packing list data
+    document.addEventListener('DOMContentLoaded', () => {
+      const packingData = JSON.parse(localStorage.getItem('packingList'));
+      
+      if (!packingData) {
+        document.body.innerHTML = `
+          <div class="flex flex-col items-center justify-center min-h-screen text-center px-4">
+            <span class="emoji-icon text-6xl mb-6 opacity-70">📭</span>
+            <h2 class="text-2xl font-bold text-white mb-4">No Packing List Found</h2>
+            <p class="text-blue-100 mb-6">It seems you haven't generated a packing list yet. Let's create one!</p>
+            <a href="trip-form.html" class="px-6 py-3 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition glow">
+              Create New List
+            </a>
+          </div>
+        `;
+        return;
+      }
+      
+      // Display trip summary
+      const tripSummary = document.getElementById('tripSummary');
+      if (packingData.tripDetails) {
+        tripSummary.textContent = `${packingData.tripDetails.destination} • ${packingData.tripDetails.duration} day${packingData.tripDetails.duration > 1 ? 's' : ''} • ${packingData.tripDetails.travelers}`;
+      }
+      
+      // Display bag suggestion
+      const bagSuggestion = document.getElementById('bagSuggestion');
+      if (packingData.bag) {
+        const bagIcon = packingData.bag.includes('suitcase') ? '🧳' : '🎒';
+        bagSuggestion.innerHTML = `
+          <span class="emoji-icon">${bagIcon}</span>
+          <span>Recommended: ${packingData.bag}</span>
+        `;
+      }
+      
+      // Display weather forecast
+      const weatherForecast = document.getElementById('weatherForecast');
+      if (packingData.weather && packingData.weather.length > 0) {
+        weatherForecast.innerHTML = packingData.weather.map(day => {
+          // Map weather conditions to appropriate emojis
+          const condition = day.condition.toLowerCase();
+          let weatherEmoji = '🌤️'; // default
+          if (condition.includes('rain')) weatherEmoji = '🌧️';
+          else if (condition.includes('cloud')) weatherEmoji = '☁️';
+          else if (condition.includes('sun') || condition.includes('clear')) weatherEmoji = '☀️';
+          else if (condition.includes('snow')) weatherEmoji = '❄️';
+          else if (condition.includes('storm')) weatherEmoji = '⛈️';
+          else if (condition.includes('fog') || condition.includes('mist')) weatherEmoji = '🌫️';
+          
+          return `
+            <div class="flex-shrink-0 px-2">
+              <div class="bg-gray-700/50 rounded-lg p-3 w-32 text-center">
+                <p class="text-sm text-blue-100 mb-1">${new Date(day.date).toLocaleDateString('en', { weekday: 'short' })}</p>
+                <span class="text-3xl floating-icon">${weatherEmoji}</span>
+                <p class="text-white font-medium">${Math.round(day.temp)}°C</p>
+                <p class="text-xs text-blue-100 capitalize mt-1">${day.condition.toLowerCase()}</p>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        document.getElementById('weatherContainer').classList.add('hidden');
+      }
+      
+      // Display packing list categories
+      const packingListContainer = document.getElementById('packingListContainer');
+      for (const [category, items] of Object.entries(packingData.list)) {
+        if (items.length > 0) {
+          // Map categories to appropriate emojis
+          let categoryEmoji = '📦'; // default
+          if (category === 'clothing') categoryEmoji = '👕';
+          else if (category === 'toiletries') categoryEmoji = '🧴';
+          else if (category === 'electronics') categoryEmoji = '📱';
+          else if (category === 'documents') categoryEmoji = '📝';
+          else if (category === 'medications') categoryEmoji = '💊';
+          else if (category === 'accessories') categoryEmoji = '🧣';
+          else if (category === 'food') categoryEmoji = '🍎';
+          else if (category === 'other') categoryEmoji = '✨';
+          
+          const categoryDiv = document.createElement('div');
+          categoryDiv.className = 'category-card bg-gray-800/70 rounded-xl p-6 border border-blue-500/30';
+          categoryDiv.innerHTML = `
+            <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+              <span class="emoji-icon">${categoryEmoji}</span>
+              ${category.charAt(0).toUpperCase() + category.slice(1)}
+            </h3>
+            <ul class="space-y-3">
+              ${items.map(item => `
+                <li class="flex items-start">
+                  <input type="checkbox" id="${category}-${item.replace(/\s+/g, '-')}" class="item-checkbox mt-1 h-4 w-4 text-blue-600 rounded border-gray-600 bg-gray-700">
+                  <label for="${category}-${item.replace(/\s+/g, '-')}" class="item-label ml-3 text-white">${item}</label>
+                </li>
+              `).join('')}
+            </ul>
+          `;
+          packingListContainer.appendChild(categoryDiv);
+        }
+      }
+      
+      // Display tips
+      const tipsContent = document.getElementById('tipsContent');
+      if (packingData.tips && packingData.tips.length > 0) {
+        tipsContent.innerHTML = packingData.tips.map(tip => `
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mt-1">
+              <div class="h-2 w-2 rounded-full bg-yellow-400"></div>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-blue-100">${tip}</p>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        tipsContent.innerHTML = '<p class="text-sm text-blue-100">No special tips for this trip.</p>';
+      }
+    });
+    
+    // Export as PDF
+    function exportPDF() {
+      const element = document.getElementById('pdfContent');
+      const opt = {
+        margin: 10,
+        filename: 'packing-list.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      // Show loading indicator
+      const loading = document.createElement('div');
+      loading.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-50';
+      loading.innerHTML = `
+        <div class="bg-gray-800 rounded-lg p-6 max-w-sm text-center">
+          <div class="flex justify-center mb-4">
+            <span class="emoji-icon text-4xl animate-spin">⏳</span>
+          </div>
+          <h3 class="text-lg font-medium text-white mb-2">Generating PDF</h3>
+          <p class="text-blue-100">Your packing list is being prepared for download...</p>
+        </div>
+      `;
+      document.body.appendChild(loading);
+      
+      // Generate PDF
+      html2pdf().from(element).set(opt).save().then(() => {
+        document.body.removeChild(loading);
+      });
+    }
+    
+    // Save list to server
+    function saveList() {
+      const packingData = JSON.parse(localStorage.getItem('packingList'));
+      
+      if (!packingData) {
+        alert('No packing list to save!');
+        return;
+      }
+      
+      // Add timestamp and user info if available
+      packingData.savedAt = new Date().toISOString();
+      
+      // Show saving indicator
+      const saveBtn = document.querySelector('button[onclick="saveList()"]');
+      const originalText = saveBtn.innerHTML;
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="flex items-center justify-center"><span class="emoji-icon animate-spin">⏳</span> Saving...</span>';
+      
+      fetch('php/save-list.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(packingData)
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok: ' + response.statusText);
+        return response.json();
+      })
+      .then(result => {
+        if (result.success) {
+          // Show success notification
+          const notification = document.createElement('div');
+          notification.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center animate__animated animate__fadeInUp';
+          notification.innerHTML = `
+            <span class="emoji-icon">✅</span>
+            <span>List saved successfully!</span>
+          `;
+          document.body.appendChild(notification);
+          
+          // Remove notification after 3 seconds
+          setTimeout(() => {
+            notification.classList.add('animate__fadeOutDown');
+            setTimeout(() => document.body.removeChild(notification), 500);
+          }, 3000);
+        } else {
+          throw new Error(result.error || 'Unknown error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to save list: ' + error.message);
+      })
+      .finally(() => {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalText;
+      });
+    }
+  </script>
+</body>
+</html>

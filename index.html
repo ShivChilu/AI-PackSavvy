@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI PackSavvy - Smart Travel Packing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+ 
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --secondary: #10b981;
+      --accent: #f59e0b;
+    }
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    
+    .title-font {
+      font-family: 'Pacifico', cursive;
+    }
+    
+    .parallax-bg {
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+    
+    .travel-card {
+      perspective: 1000px;
+      transform-style: preserve-3d;
+    }
+    
+    .travel-card-inner {
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+    
+    .travel-card:hover .travel-card-inner {
+      transform: rotateY(180deg);
+    }
+    
+    .travel-card-front, .travel-card-back {
+      backface-visibility: hidden;
+    }
+    
+    .travel-card-back {
+      transform: rotateY(180deg);
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .floating {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .emoji-icon {
+      font-size: 2rem;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .social-icon {
+      font-size: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="fixed inset-0 overflow-hidden -z-10">
+    <div class="absolute inset-0 bg-gradient-to-b from-blue-900 to-indigo-900 opacity-90"></div>
+    <div class="absolute inset-0 bg-[url('./assets/images/world-map.png')] bg-cover opacity-20"></div>
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden">
+      <div class="absolute top-1/4 left-1/4 w-16 h-16 rounded-full bg-yellow-400 opacity-20 animate-pulse"></div>
+      <div class="absolute top-1/3 right-1/3 w-24 h-24 rounded-full bg-blue-400 opacity-15 animate-pulse delay-100"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-20 h-20 rounded-full bg-green-400 opacity-15 animate-pulse delay-200"></div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="py-6 px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+          <img src="assets/images/ailogo2.png" alt="Logo" class="h-12 w-12">
+          <h1 class="title-font text-3xl text-white">AI PackSavvy</h1>
+        </div>
+        <nav>
+          <ul class="flex space-x-6">
+            <li><a href="#" class="text-white hover:text-yellow-300 transition">🏠 Home</a></li>
+            <li><a href="#" class="text-white hover:text-yellow-300 transition">✨ Features</a></li>
+            <li><a href="#" class="text-white hover:text-yellow-300 transition">ℹ️ About</a></li>
+            <li><a href="login.html" class="px-4 py-2 bg-blue-600 rounded-full hover:bg-blue-700 transition">🔑 Login</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+      <div class="text-center max-w-4xl">
+        <h1 class="title-font text-5xl sm:text-6xl md:text-7xl font-bold text-white mb-6 animate__animated animate__fadeInDown">
+          Pack Smart, <span class="text-yellow-300">Travel Light</span>
+        </h1>
+        <p class="text-xl sm:text-2xl text-blue-100 mb-10 animate__animated animate__fadeIn animate__delay-1s">
+          Your AI-powered travel companion that ensures you never forget essentials again!
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4 animate__animated animate__fadeInUp animate__delay-1s">
+          <a href="trip-form.html" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full text-lg font-semibold text-white hover:from-blue-700 hover:to-blue-600 transition transform hover:scale-105 shadow-lg glow">
+            🧳 Start Packing Now
+          </a>
+          <a href="#features" class="px-8 py-4 bg-transparent border-2 border-blue-500 rounded-full text-lg font-semibold text-white hover:bg-blue-900/30 transition transform hover:scale-105">
+            ℹ️ Learn More
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Floating Suitcase Animation -->
+    <div class="absolute bottom-10 left-10 hidden lg:block">
+      <span class="emoji-icon floating">🧳</span>
+    </div>
+    <div class="absolute top-20 right-10 hidden lg:block">
+      <span class="emoji-icon floating" style="animation-delay: 1s;">🛂</span>
+    </div>
+
+    <!-- Scrolling Features -->
+    <section id="features" class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-900/50 to-indigo-900/50">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center mb-16 text-white">✨ Why Choose PackSavvy?</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Feature 1 -->
+          <div class="travel-card h-full">
+            <div class="travel-card-inner h-full">
+              <div class="travel-card-front bg-gray-800/70 rounded-xl p-6 border border-blue-500/30 h-full flex flex-col items-center text-center">
+                <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-6">
+                  <span class="feature-icon">🤖</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Smart AI Recommendations</h3>
+                <p class="text-blue-100">Our advanced AI analyzes your trip details to suggest exactly what you need.</p>
+              </div>
+              <div class="travel-card-back absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl p-6 flex flex-col justify-center items-center text-center">
+                <h3 class="text-xl font-bold mb-3 text-white">🌦️ Weather-Adaptive</h3>
+                <p class="text-blue-100">Automatically adjusts recommendations based on destination weather forecasts.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Feature 2 -->
+          <div class="travel-card h-full">
+            <div class="travel-card-inner h-full">
+              <div class="travel-card-front bg-gray-800/70 rounded-xl p-6 border border-green-500/30 h-full flex flex-col items-center text-center">
+                <div class="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mb-6">
+                  <span class="feature-icon">👨‍👩‍👧‍👦</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Family Friendly</h3>
+                <p class="text-blue-100">Specialized packing for kids of all ages and family travel needs.</p>
+              </div>
+              <div class="travel-card-back absolute inset-0 bg-gradient-to-br from-green-600 to-green-800 rounded-xl p-6 flex flex-col justify-center items-center text-center">
+                <h3 class="text-xl font-bold mb-3 text-white">👶 Age-Specific</h3>
+                <p class="text-blue-100">Custom lists for babies, toddlers, and older children with appropriate items.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Feature 3 -->
+          <div class="travel-card h-full">
+            <div class="travel-card-inner h-full">
+              <div class="travel-card-front bg-gray-800/70 rounded-xl p-6 border border-yellow-500/30 h-full flex flex-col items-center text-center">
+                <div class="w-20 h-20 bg-yellow-600 rounded-full flex items-center justify-center mb-6">
+                  <span class="feature-icon">📤</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Export & Share</h3>
+                <p class="text-blue-100">Create beautiful PDFs or share your lists with travel companions.</p>
+              </div>
+              <div class="travel-card-back absolute inset-0 bg-gradient-to-br from-yellow-600 to-yellow-800 rounded-xl p-6 flex flex-col justify-center items-center text-center">
+                <h3 class="text-xl font-bold mb-3 text-white">🔄 Multi-Format</h3>
+                <p class="text-blue-100">Export as PDF, text, or even sync with your favorite calendar app.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-indigo-900/20">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-16 text-white">💖 Travelers Love PackSavvy</h2>
+        
+        <div class="relative">
+          <!-- Testimonial Cards -->
+          <div class="grid grid-cols-1 gap-8">
+            <!-- Testimonial 1 -->
+            <div class="bg-gray-800/70 rounded-xl p-8 border-l-4 border-blue-500 transform transition hover:scale-105">
+              <div class="flex items-center mb-4">
+                <img src="assets/images/profile1.jpg" alt="Sarah J." class="w-12 h-12 rounded-full mr-4">
+                <div>
+                  <h4 class="font-bold">Sarah J.</h4>
+                  <div class="flex text-yellow-400">
+                    ★★★★★
+                  </div>
+                </div>
+              </div>
+              <p class="text-blue-100 italic">"PackSavvy saved my family vacation! With two kids under 5, I always forget something. This time we had everything we needed, even the baby powder I usually forget!"</p>
+            </div>
+            
+            <!-- Testimonial 2 -->
+            <div class="bg-gray-800/70 rounded-xl p-8 border-l-4 border-green-500 transform transition hover:scale-105">
+              <div class="flex items-center mb-4">
+                <img src="assets/images/profile pic2.jpg" alt="Sarah J." class="w-12 h-12 rounded-full mr-4">
+                <div>
+                  <h4 class="font-bold">Mike T.</h4>
+                  <div class="flex text-yellow-400">
+                    ★★★★★
+                  </div>
+                </div>
+              </div>
+              <p class="text-blue-100 italic">"As a frequent business traveler, PackSavvy has become my essential pre-trip tool. The weather-based recommendations are spot on!"</p>
+            </div>
+          </div>
+          
+          <!-- Decorative Elements -->
+          <span class="emoji-icon absolute -top-10 -left-10 text-6xl opacity-70 hidden lg:block">📊</span>
+          <span class="emoji-icon absolute -bottom-10 -right-10 text-6xl opacity-70 hidden lg:block">🧾</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-900 to-indigo-900">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mb-6">🚀 Ready to Transform Your Packing?</h2>
+        <p class="text-xl text-blue-100 mb-10">Join thousands of travelers who never forget essentials again.</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <a href="trip-form.html" class="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-full text-lg font-semibold text-gray-900 hover:from-yellow-600 hover:to-yellow-500 transition transform hover:scale-105 shadow-lg">
+            🧳 Start Packing Now
+          </a>
+          <a href="#" class="px-8 py-4 bg-transparent border-2 border-white rounded-full text-lg font-semibold text-white hover:bg-white/10 transition transform hover:scale-105">
+            ▶️ Watch Demo
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-900/80">
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center space-x-2 mb-4">
+              <img src="assets/images/ailogo2.png" alt="Logo" class="h-12 w-12">
+              <h3 class="title-font text-2xl text-white">AI PackSavvy</h3>
+            </div>
+            <p class="text-blue-100">Your smart travel packing companion since 2023.</p>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold mb-4 text-white">🔗 Quick Links</h4>
+            <ul class="space-y-2">
+              <li><a href="#" class="text-blue-100 hover:text-yellow-300 transition">🏠 Home</a></li>
+              <li><a href="#" class="text-blue-100 hover:text-yellow-300 transition">✨ Features</a></li>
+              <li><a href="#" class="text-blue-100 hover:text-yellow-300 transition">💰 Pricing</a></li>
+              <li><a href="#" class="text-blue-100 hover:text-yellow-300 transition">📞 Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold mb-4 text-white">📚 Resources</h4>
+            <ul class="space-y-2">
+              <li><a href="#" class="text-blue-100 hover:text-yellow-300 transition">✍️ Blog</a></li>
+              <li><a href="#" class="text-blue-100 hover:text-yellow-300 transition">❓ Help Center</a></li>
+              <li><a href="#" class="text-blue-100 hover:text-yellow-300 transition">🧳 Packing Tips</a></li>
+              <li><a href="#" class="text-blue-100 hover:text-yellow-300 transition">🌍 Travel Guides</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold mb-4 text-white">📱 Connect</h4>
+            <div class="flex space-x-4">
+              <a href="#" class="text-blue-100 hover:text-yellow-300 transition"><span class="social-icon">📘</span></a>
+              <a href="#" class="text-blue-100 hover:text-yellow-300 transition"><span class="social-icon">🐦</span></a>
+              <a href="#" class="text-blue-100 hover:text-yellow-300 transition"><span class="social-icon">📸</span></a>
+              <a href="#" class="text-blue-100 hover:text-yellow-300 transition"><span class="social-icon">📌</span></a>
+            </div>
+          </div>
+        </div>
+        <div class="border-t border-gray-700 mt-12 pt-8 text-center text-blue-100">
+          <p>© 2023 AI PackSavvy. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Initialize GSAP animations
+    gsap.registerPlugin(ScrollTrigger);
+    
+    // Animate features on scroll
+    gsap.utils.toArray('.travel-card').forEach(card => {
+      gsap.from(card, {
+        scrollTrigger: {
+          trigger: card,
+          start: "top 80%",
+          toggleActions: "play none none none"
+        },
+        opacity: 0,
+        y: 50,
+        duration: 0.8,
+        ease: "power2.out"
+      });
+    });
+    
+    // Animate testimonials
+    gsap.utils.toArray('.bg-gray-800\\/70').forEach((el, i) => {
+      gsap.from(el, {
+        scrollTrigger: {
+          trigger: el,
+          start: "top 80%",
+          toggleActions: "play none none none"
+        },
+        opacity: 0,
+        x: i % 2 === 0 ? -50 : 50,
+        duration: 0.8,
+        delay: i * 0.1,
+        ease: "back.out(1.7)"
+      });
+    });
+    
+    // Floating elements animation
+    const floatingElements = gsap.utils.toArray('.floating');
+    floatingElements.forEach(el => {
+      gsap.to(el, {
+        y: 20,
+        duration: 3 + Math.random() * 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut"
+      });
+    });
+  </script>
+</body>
+</html>

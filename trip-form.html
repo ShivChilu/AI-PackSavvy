@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trip Details - AI PackSavvy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --secondary: #10b981;
+      --accent: #f59e0b;
+    }
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    
+    .step {
+      transition: all 0.5s ease;
+    }
+    
+    .step-hidden {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+    }
+    
+    .step-visible {
+      opacity: 1;
+      height: auto;
+    }
+    
+    .progress-bar {
+      height: 6px;
+      transition: width 0.5s ease;
+    }
+    
+    .activity-chip {
+      transition: all 0.3s ease;
+    }
+    
+    .activity-chip.selected {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+    
+    .glow {
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    }
+    
+    .glow:hover {
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .animate-pulse-once {
+      animation: pulse 0.5s ease-in-out;
+    }
+    
+    .weather-preview {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+      backdrop-filter: blur(10px);
+    }
+    
+    .emoji-icon {
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+    }
+    
+    .activity-emoji {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-900">
+  <!-- Header -->
+  <header class="py-6 px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <span class="emoji-icon">🧳</span>
+        <h1 class="text-xl font-bold text-white">AI PackSavvy</h1>
+      </div>
+      <div class="text-sm text-blue-200">
+        Step <span id="currentStep">1</span> of 5
+      </div>
+    </div>
+    <div class="mt-4 w-full bg-gray-700 rounded-full h-2">
+      <div id="progressBar" class="progress-bar bg-blue-500 rounded-full h-2" style="width: 20%"></div>
+    </div>
+  </header>
+
+  <!-- Main Form -->
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-3xl">
+    <form id="tripForm" class="space-y-8">
+      <!-- Step 1: Basic Trip Info -->
+      <div id="step1" class="step step-visible animate__animated animate__fadeIn">
+        <div class="bg-gray-800/70 rounded-xl p-6 sm:p-8 border border-blue-500/30">
+          <h2 class="text-2xl font-bold mb-6 text-white">Trip Details</h2>
+          
+          <div class="space-y-6">
+            <div>
+              <label for="destination" class="block text-sm font-medium mb-1 text-blue-100">Destination</label>
+              <div class="relative">
+                <input type="text" id="destination" name="destination" required
+                  class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-400 transition"
+                  placeholder="Where are you going?">
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <span class="emoji-icon">📍</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label for="start_date" class="block text-sm font-medium mb-1 text-blue-100">Start Date</label>
+                <div class="relative">
+                  <input type="date" id="start_date" name="start_date" required
+                    class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-400 transition">
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <span class="emoji-icon">📅</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <label for="end_date" class="block text-sm font-medium mb-1 text-blue-100">End Date</label>
+                <div class="relative">
+                  <input type="date" id="end_date" name="end_date" required
+                    class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-400 transition">
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <span class="emoji-icon">📅</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+           
+          </div>
+          
+          <div class="mt-8 flex justify-between">
+            <button type="button" disabled class="px-6 py-3 bg-gray-600 rounded-lg text-white opacity-50 cursor-not-allowed">
+              Previous
+            </button>
+            <button type="button" onclick="nextStep(2)" class="px-6 py-3 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition glow">
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Step 2: Traveler Information -->
+      <div id="step2" class="step step-hidden">
+        <div class="bg-gray-800/70 rounded-xl p-6 sm:p-8 border border-blue-500/30">
+          <h2 class="text-2xl font-bold mb-6 text-white">About You</h2>
+          
+          <div class="space-y-6">
+            <div>
+              <label class="block text-sm font-medium mb-2 text-blue-100">Who's traveling?</label>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <label class="flex items-center space-x-2 p-3 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+                  <input type="radio" name="traveler_type" value="solo" class="text-blue-600 focus:ring-blue-500" checked>
+                  <span class="emoji-icon">👤</span>
+                  <span class="text-white">Solo</span>
+                </label>
+                <label class="flex items-center space-x-2 p-3 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+                  <input type="radio" name="traveler_type" value="couple" class="text-blue-600 focus:ring-blue-500">
+                  <span class="emoji-icon">👫</span>
+                  <span class="text-white">Couple</span>
+                </label>
+                <label class="flex items-center space-x-2 p-3 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+                  <input type="radio" name="traveler_type" value="family" class="text-blue-600 focus:ring-blue-500">
+                  <span class="emoji-icon">👪</span>
+                  <span class="text-white">Family</span>
+                </label>
+              </div>
+            </div>
+            
+            <div id="familyFields" class="hidden space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="adults" class="block text-sm font-medium mb-1 text-blue-100">Number of Adults</label>
+                  <input type="number" id="adults" name="adults" min="1" value="2"
+                    class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-white">
+                </div>
+                <div>
+                  <label for="kids" class="block text-sm font-medium mb-1 text-blue-100">Number of Kids</label>
+                  <input type="number" id="kids" name="kids" min="0" value="0"
+                    class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-white"
+                    onchange="addKidFields(this)">
+                </div>
+              </div>
+              
+              <div id="kidDetails" class="space-y-3"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label for="gender" class="block text-sm font-medium mb-1 text-blue-100">Your Gender</label>
+                <select id="gender" name="gender" required
+                  class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-white">
+                  <option value="male">👨 Male</option>
+                  <option value="female">👩 Female</option>
+                  <option value="other">🧑 Other/Prefer not to say</option>
+                </select>
+              </div>
+              
+              <div>
+                <label for="wear_type" class="block text-sm font-medium mb-1 text-blue-100">Clothing Preference</label>
+                <select id="wear_type" name="wear_type" required
+                  class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-white">
+                  <option value="casual">👕 Casual</option>
+                  <option value="formal">👔 Formal</option>
+                  <option value="traditional">👘 Traditional</option>
+                  <option value="sporty">🏃 Sporty</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between">
+            <button type="button" onclick="prevStep(1)" class="px-6 py-3 bg-gray-600 rounded-lg text-white hover:bg-gray-700 transition">
+              Previous
+            </button>
+            <button type="button" onclick="nextStep(3)" class="px-6 py-3 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition glow">
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Step 3: Activities -->
+      <!-- Step 3: Activities -->
+<div id="step3" class="step step-hidden">
+  <div class="bg-gray-800/70 rounded-xl p-6 sm:p-8 border border-blue-500/30">
+    <h2 class="text-2xl font-bold mb-6 text-white">Planned Activities</h2>
+    <p class="text-blue-100 mb-6">Select all activities you plan to do (helps us recommend specialized items)</p>
+    
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="swimming" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🏊</span>
+          <span class="text-sm text-white">Swimming</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="hiking" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🥾</span>
+          <span class="text-sm text-white">Hiking</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="beach" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🏖️</span>
+          <span class="text-sm text-white">Beach</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="business" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">💼</span>
+          <span class="text-sm text-white">Business</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="sightseeing" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🏛️</span>
+          <span class="text-sm text-white">Sightseeing</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="camping" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🏕️</span>
+          <span class="text-sm text-white">Camping</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="skiing" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">⛷️</span>
+          <span class="text-sm text-white">Skiing</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="shopping" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🛍️</span>
+          <span class="text-sm text-white">Shopping</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="dining" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🍽️</span>
+          <span class="text-sm text-white">Fine Dining</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="photography" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">📷</span>
+          <span class="text-sm text-white">Photography</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="cycling" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🚴</span>
+          <span class="text-sm text-white">Cycling</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="golf" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">⛳</span>
+          <span class="text-sm text-white">Golf</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="fishing" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🎣</span>
+          <span class="text-sm text-white">Fishing</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="yoga" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🧘</span>
+          <span class="text-sm text-white">Yoga</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="concerts" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🎤</span>
+          <span class="text-sm text-white">Concerts</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="cruise" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🛳️</span>
+          <span class="text-sm text-white">Cruise</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="winter_sports" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🎿</span>
+          <span class="text-sm text-white">Winter Sports</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="theme_park" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🎢</span>
+          <span class="text-sm text-white">Theme Park</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="scuba_diving" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🤿</span>
+          <span class="text-sm text-white">Scuba Diving</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="surfing" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🏄</span>
+          <span class="text-sm text-white">Surfing</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="wedding" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">💒</span>
+          <span class="text-sm text-white">Wedding</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="safari" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🦁</span>
+          <span class="text-sm text-white">Safari</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="road_trip" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🚗</span>
+          <span class="text-sm text-white">Road Trip</span>
+        </div>
+      </label>
+      
+      <label class="activity-chip">
+        <input type="checkbox" name="activities[]" value="backpacking" class="hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+          <span class="activity-emoji">🎒</span>
+          <span class="text-sm text-white">Backpacking</span>
+        </div>
+      </label>
+    </div>
+    
+    <div class="mt-8 flex justify-between">
+      <button type="button" onclick="prevStep(2)" class="px-6 py-3 bg-gray-600 rounded-lg text-white hover:bg-gray-700 transition">
+        Previous
+      </button>
+      <button type="button" onclick="nextStep(4)" class="px-6 py-3 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition glow">
+        Next
+      </button>
+    </div>
+  </div>
+</div>
+      
+      <!-- Step 4: Special Requirements -->
+      <div id="step4" class="step step-hidden">
+        <div class="bg-gray-800/70 rounded-xl p-6 sm:p-8 border border-blue-500/30">
+          <h2 class="text-2xl font-bold mb-6 text-white">Special Requirements</h2>
+          
+          <div class="space-y-6">
+            <div>
+              <label class="block text-sm font-medium mb-2 text-blue-100">Do you have any special needs?</label>
+              <div class="space-y-3">
+                <label class="flex items-center space-x-3 p-3 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+                  <input type="checkbox" name="special_needs[]" value="medication" class="text-blue-600 focus:ring-blue-500 rounded">
+                  <span class="emoji-icon">💊</span>
+                  <span class="text-white">I need to pack medication</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+                  <input type="checkbox" name="special_needs[]" value="dietary" class="text-blue-600 focus:ring-blue-500 rounded">
+                  <span class="emoji-icon">🥗</span>
+                  <span class="text-white">I have special dietary needs</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3 rounded-lg bg-gray-700 border border-gray-600 cursor-pointer hover:bg-gray-600 transition">
+                  <input type="checkbox" name="special_needs[]" value="accessibility" class="text-blue-600 focus:ring-blue-500 rounded">
+                  <span class="emoji-icon">♿</span>
+                  <span class="text-white">I need accessibility items</span>
+                </label>
+              </div>
+            </div>
+            
+            <div>
+              <label for="special_notes" class="block text-sm font-medium mb-1 text-blue-100">Additional Notes</label>
+              <textarea id="special_notes" name="special_notes" rows="3"
+                class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-400 transition"
+                placeholder="Anything else we should consider?"></textarea>
+            </div>
+          </div> 
+          
+          <div class="mt-8 flex justify-between">
+            <button type="button" onclick="prevStep(3)" class="px-6 py-3 bg-gray-600 rounded-lg text-white hover:bg-gray-700 transition">
+              Previous
+            </button>
+            <button type="button" onclick="nextStep(5)" class="px-6 py-3 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition glow">
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Step 5: Review & Submit -->
+      <div id="step5" class="step step-hidden">
+        <div class="bg-gray-800/70 rounded-xl p-6 sm:p-8 border border-blue-500/30">
+          <h2 class="text-2xl font-bold mb-6 text-white">📋 Review Your Trip</h2>
+          
+          <div class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div class="bg-gray-700/50 rounded-lg p-4">
+                <h3 class="font-semibold text-white mb-2">✈️ Trip Details</h3>
+                <p id="reviewDestination" class="text-blue-100">-</p>
+                <p id="reviewDates" class="text-blue-100">-</p>
+                <p id="reviewDuration" class="text-blue-100">-</p>
+              </div>
+              
+              <div class="bg-gray-700/50 rounded-lg p-4">
+                <h3 class="font-semibold text-white mb-2">👥 Travelers</h3>
+                <p id="reviewTravelers" class="text-blue-100">-</p>
+                <p id="reviewGender" class="text-blue-100">-</p>
+                <p id="reviewStyle" class="text-blue-100">-</p>
+              </div>
+            </div>
+            
+            <div class="bg-gray-700/50 rounded-lg p-4">
+              <h3 class="font-semibold text-white mb-2">🎯 Activities</h3>
+              <p id="reviewActivities" class="text-blue-100">No activities selected</p>
+            </div>
+            
+            <div class="bg-gray-700/50 rounded-lg p-4">
+              <h3 class="font-semibold text-white mb-2">⚠️ Special Requirements</h3>
+              <p id="reviewSpecial" class="text-blue-100">None specified</p>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <input type="checkbox" id="confirmDetails" name="confirmDetails" required
+                class="h-4 w-4 text-blue-600 focus:ring-blue-500 rounded border-gray-600 bg-gray-700">
+              <label for="confirmDetails" class="text-sm text-blue-100">I confirm these details are correct</label>
+            </div>
+          </div>
+          
+          <div class="mt-8 flex justify-between">
+            <button type="button" onclick="prevStep(4)" class="px-6 py-3 bg-gray-600 rounded-lg text-white hover:bg-gray-700 transition">
+              Previous
+            </button>
+            <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg text-white hover:from-blue-700 hover:to-blue-600 transition glow animate-pulse-once">
+              🧳 Generate Packing List
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    // Initialize activity chips selection
+    document.querySelectorAll('.activity-chip').forEach(chip => {
+      const checkbox = chip.querySelector('input[type="checkbox"]');
+      
+      chip.addEventListener('click', () => {
+        checkbox.checked = !checkbox.checked;
+        chip.classList.toggle('selected', checkbox.checked);
+      });
+    });
+    
+    // Traveler type change handler
+    document.querySelectorAll('input[name="traveler_type"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        const familyFields = document.getElementById('familyFields');
+        familyFields.classList.toggle('hidden', this.value !== 'family');
+      });
+    });
+    
+    // Form submission handler
+    document.getElementById('tripForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="flex items-center justify-center"><svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating...</span>';
+      
+      try {
+        const formData = new FormData(e.target);
+        const response = await fetch('php/generate-list.php', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        localStorage.setItem('packingList', JSON.stringify(data));
+        window.location.href = 'packing-list.html';
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to generate packing list. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🧳 Generate Packing List';
+      }
+    });
+    
+    // Update review section when reaching step 5
+    function updateReviewSection() {
+      if (document.getElementById('step5').classList.contains('step-visible')) {
+        const form = document.getElementById('tripForm');
+        const formData = new FormData(form);
+        
+        // Trip details
+        document.getElementById('reviewDestination').textContent = `📍 Destination: ${formData.get('destination') || 'Not specified'}`;
+        
+        const startDate = formData.get('start_date') ? new Date(formData.get('start_date')).toLocaleDateString() : 'Not specified';
+        const endDate = formData.get('end_date') ? new Date(formData.get('end_date')).toLocaleDateString() : 'Not specified';
+        document.getElementById('reviewDates').textContent = `📅 Dates: ${startDate} to ${endDate}`;
+        
+        if (formData.get('start_date') && formData.get('end_date')) {
+          const start = new Date(formData.get('start_date'));
+          const end = new Date(formData.get('end_date'));
+          const duration = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+          document.getElementById('reviewDuration').textContent = `⏱️ Duration: ${duration} day${duration > 1 ? 's' : ''}`;
+        } else {
+          document.getElementById('reviewDuration').textContent = '⏱️ Duration: Not specified';
+        }
+        
+        // Travelers
+        const travelerType = formData.get('traveler_type') || 'solo';
+        let travelersText = '';
+        
+        if (travelerType === 'solo') {
+          travelersText = '👤 Traveler: Solo';
+        } else if (travelerType === 'couple') {
+          travelersText = '👫 Travelers: Couple';
+        } else if (travelerType === 'family') {
+          const adults = formData.get('adults') || 2;
+          const kids = formData.get('kids') || 0;
+          travelersText = `👪 Travelers: ${adults} adult${adults > 1 ? 's' : ''}${kids > 0 ? `, ${kids} kid${kids > 1 ? 's' : ''}` : ''}`;
+        }
+        
+        document.getElementById('reviewTravelers').textContent = travelersText;
+        document.getElementById('reviewGender').textContent = `🚻 Gender: ${formData.get('gender') || 'Not specified'}`;
+        document.getElementById('reviewStyle').textContent = `👗 Style: ${formData.get('wear_type') || 'casual'}`;
+        
+        // Activities
+        const activities = formData.getAll('activities[]');
+        document.getElementById('reviewActivities').textContent = activities.length > 0 
+          ? activities.map(a => {
+              const icon = {
+                swimming: '🏊',
+                hiking: '🥾',
+                beach: '🏖️',
+                business: '💼',
+                sightseeing: '🏛️',
+                camping: '🏕️'
+              }[a] || '✅';
+              return `${icon} ${a.charAt(0).toUpperCase() + a.slice(1)}`;
+            }).join(', ')
+          : '❌ No activities selected';
+        
+        // Special requirements
+        const specialNeeds = formData.getAll('special_needs[]');
+        const specialNotes = formData.get('special_notes');
+        
+        let specialText = '';
+        if (specialNeeds.length > 0) {
+          specialText = specialNeeds.map(n => {
+            if (n === 'medication') return '💊 Medication';
+            if (n === 'dietary') return '🥗 Dietary needs';
+            if (n === 'accessibility') return '♿ Accessibility items';
+            return n;
+          }).join(', ');
+        }
+        
+        if (specialNotes) {
+          specialText += specialText ? `, 📝 Notes: ${specialNotes}` : `📝 Notes: ${specialNotes}`;
+        }
+        
+        document.getElementById('reviewSpecial').textContent = specialText || '✅ None specified';
+      }
+    }
+    
+    // Enhanced step navigation with animations
+    function nextStep(step) {
+      const currentStep = document.querySelector('.step-visible');
+      const nextStep = document.getElementById(`step${step}`);
+      
+      currentStep.classList.remove('step-visible');
+      currentStep.classList.add('step-hidden');
+      currentStep.classList.remove('animate__fadeIn');
+      currentStep.classList.add('animate__fadeOut');
+      
+      setTimeout(() => {
+        nextStep.classList.remove('step-hidden');
+        nextStep.classList.add('step-visible', 'animate__animated', 'animate__fadeIn');
+        
+        // Update progress bar
+        const progress = (step / 5) * 100;
+        document.getElementById('progressBar').style.width = `${progress}%`;
+        document.getElementById('currentStep').textContent = step;
+        
+        // Update review section if we're on step 5
+        if (step === 5) {
+          updateReviewSection();
+        }
+      }, 300);
+    }
+    
+    function prevStep(step) {
+      const currentStep = document.querySelector('.step-visible');
+      const prevStep = document.getElementById(`step${step}`);
+      
+      currentStep.classList.remove('step-visible');
+      currentStep.classList.add('step-hidden');
+      currentStep.classList.remove('animate__fadeIn');
+      currentStep.classList.add('animate__fadeOut');
+      
+      setTimeout(() => {
+        prevStep.classList.remove('step-hidden');
+        prevStep.classList.add('step-visible', 'animate__animated', 'animate__fadeIn');
+        
+        // Update progress bar
+        const progress = (step / 5) * 100;
+        document.getElementById('progressBar').style.width = `${progress}%`;
+        document.getElementById('currentStep').textContent = step;
+      }, 300);
+    }
+    
+    // Initialize kid fields if family is selected
+    function addKidFields(input) {
+      const count = parseInt(input.value) || 0;
+      const kidDetails = document.getElementById('kidDetails');
+      kidDetails.innerHTML = '';
+      
+      for (let i = 0; i < count; i++) {
+        const div = document.createElement('div');
+        div.className = 'bg-gray-700 rounded-lg p-3 space-y-2';
+        div.innerHTML = `
+          <h4 class="text-sm font-medium text-blue-100">👶 Kid ${i + 1}</h4>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <input type="number" name="kid_age_${i}" placeholder="Age" min="0" max="18" 
+                class="w-full px-3 py-2 rounded bg-gray-600 border border-gray-500 text-white">
+            </div>
+            <div>
+              <select name="kid_gender_${i}" class="w-full px-3 py-2 rounded bg-gray-600 border border-gray-500 text-white">
+                <option value="male">👦 Male</option>
+                <option value="female">👧 Female</option>
+              </select>
+            </div>
+          </div>
+        `;
+        kidDetails.appendChild(div);
+      }
+    }
+    
+    // Weather preview functionality
+    
+  </script>
+</body>
+</html>
